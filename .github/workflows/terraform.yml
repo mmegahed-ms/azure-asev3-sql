@@ -1,0 +1,63 @@
+name: 'Terraform'
+
+on: 
+  workflow_dispatch:
+
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+      TF_VAR_db_username: ${{ secrets.AZURE_DB_USER_ID }}
+      TF_VAR_db_password: ${{ secrets.AZURE_DB_USER_SECRET }}
+      TF_VAR_sql_ad_admin_id: ${{ secrets.AZURE_DB_SQL_AD }}
+     # TF_VAR_db_connection: ${{ secrets.AZURE_DB_CONNECTION_SECRET }}
+     
+    runs-on: ubuntu-latest
+    environment: development
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Azure Login
+    - name: Azure Login
+      run: |
+        az login --service-principal --username "${{ secrets.AZURE_AD_CLIENT_ID }}" --password "${{ secrets.AZURE_AD_CLIENT_SECRET }}" --tenant "${{ secrets.AZURE_AD_TENANT_ID }}" 
+        az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+    
+
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init
+
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: terraform plan -input=false
+
+      # On push to "main", build or change infrastructure according to Terraform configuration files
+      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
+      run: terraform apply -auto-approve -input=false
