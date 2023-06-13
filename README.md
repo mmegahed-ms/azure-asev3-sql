@@ -5,7 +5,7 @@ This repository contains the iac for a terrafrom script that automate the deploy
 
 # Architecture
 
-![image](https://github.com/mmegahed-ms/poc-tf/assets/113107532/541360a2-1cd6-4023-8da6-a17208255339)
+![image](https://github.com/mmegahed-ms/azure-asev3-sql/blob/main/assets/arch.png)
 
 
 # Prerequisites
@@ -26,10 +26,10 @@ In GitHub, go to your repository.
 
 Select Security > Secrets and variables > Actions.
 
-![image](https://github.com/mmegahed-ms/poc-tf/assets/113107532/e34e0937-ab88-4e7e-9ac0-ab09c1fb4f3f)
+![image](https://github.com/mmegahed-ms/azure-asev3-sql/blob/main/assets/secrets.png)
 
 
-![image](https://github.com/mmegahed-ms/poc-tf/assets/113107532/26830bdc-5bf7-4210-929f-d6fe18019456)
+![image](https://github.com/mmegahed-ms/azure-asev3-sql/blob/main/assets/actions.png)
 
 
 Select New repository secret.
